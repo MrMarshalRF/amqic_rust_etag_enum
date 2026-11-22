@@ -1,6 +1,8 @@
 # Third-party notices
 
-The project license covers amqic.ai's first-party source and documentation. It does
+The project license covers first-party source and documentation distributed by
+Aleksei Sergeyevich Musienko, individual entrepreneur operating as AlexMus
+Quantum Information Consortium (AMQIC). It does
 not relicense dependencies or restrict rights granted by their own licensors.
 
 Direct dependencies pinned through Cargo.lock include:

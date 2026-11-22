@@ -1,12 +1,27 @@
 # Commercial and organizational licensing
 
-Copyright (c) 2026 amqic.ai
+Copyright (c) 2026 Aleksei Sergeyevich Musienko
+
+The Licensor is Aleksei Sergeyevich Musienko, an individual entrepreneur
+operating under the commercial designation AlexMus Quantum Information
+Consortium (AMQIC).
+
+Public particulars:
+
+- Status: individual entrepreneur.
+- Full name: Aleksei Sergeyevich Musienko.
+- Commercial designation: AlexMus Quantum Information Consortium (AMQIC).
+- Registration number: 001-2026-169-2608.
+- Taxpayer identification number (INN): 23005199640028.
+- OKPO: 35124193.
+- Registration date: 23 July 2026.
+- Place of business: Bishkek, Kyrgyz Republic.
 
 ETag for Codex is available without a license fee for personal noncommercial
 use under [the AMQIC Personal Noncommercial License 1.0](LICENSE).
 
 **Every commercial use requires a prior written license agreement with
-amqic.ai.** This applies to individuals, freelancers, contractors, sole
+the Licensor identified above.** This applies to individuals, freelancers, contractors, sole
 proprietors and companies. Company and other organizational use also requires
 an agreement, including use of internal tools and use without revenue.
 
@@ -35,7 +50,7 @@ commercial terms must be agreed separately; this page makes no offer of a
 particular price, service level or support commitment.
 
 Third-party components remain subject to their respective licenses. A license
-from amqic.ai does not replace permissions required from other rights holders.
+from the Licensor does not replace permissions required from other rights holders.
 
 The [LICENSE](LICENSE) contains the operative free-license terms. This page
 explains the licensing enquiry process and grants no additional rights.

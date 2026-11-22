@@ -6,6 +6,50 @@ The package addresses two separate problems. A strong ETag detects changes to th
 
 The reference kernel provides SHA-256, checked integer addition and a synthetic counter. It is an integration example with closed command and result enums; it does not execute arbitrary shell commands.
 
+## Typed commands, results and recovery states
+
+Rust enums define the operations the executor understands and the outcomes a caller must handle. Each command carries its own typed parameters; callers cannot substitute an arbitrary command name or attach unrelated fields. An exhaustive Rust `match` makes a newly added variant visible to code that handles these enums. Serde converts the same closed types to JSON at the CLI, MCP and journal boundaries.
+
+The [kernel types](src/kernel.rs) have these command and result variants:
+
+| Rust command | JSON command | Successful `MemberResult` | Meaning |
+|---|---|---|---|
+| `Command::Sha256 { text }` | `{"kind":"sha256","text":"hello"}` | `Sha256 { etag }` | Hashes the UTF-8 bytes of `text` and returns a strong ETag |
+| `Command::SumI64 { values }` | `{"kind":"sum_i64","values":[10,20,30]}` | `SumI64 { value: 60 }` | Adds signed 64-bit integers with checked arithmetic |
+| `Command::IncrementCounter { amount }` | `{"kind":"increment_counter","amount":1}` | `Counter { value }` | Changes the synthetic session counter under its lock or journal transaction |
+
+Checked arithmetic can instead produce `MemberResult::Refused { reason: Refusal::IntegerOverflow }`, serialized as `{"kind":"refused","reason":"integer_overflow"}`. A refusal belongs to that member; it does not erase successful members. Kernel `Status` is `completed` when all members succeed, `partial` when only some succeed, and `refused` when none succeed. An admitted batch records its report and advances the revision even if every member is refused. Admission errors such as a stale ETag, stale revision or conflicting operation ID return a package `Error` before new member execution.
+
+For example, an increment by one in a new session produces this payload inside a `Report<kernel::Output>`:
+
+```json
+{
+  "operation_id": "counter-001",
+  "status": "completed",
+  "revision": 1,
+  "counter": 1,
+  "members": [{"id":"increment","result":{"kind":"counter","value":1}}]
+}
+```
+
+The surrounding report also contains `schema`, `input_etag` and the result `etag`. Verify those fields with `Report::verify` or the CLI `verify_result` action; interpreting a member result alone does not verify the report's binding to an accepted input.
+
+The [API adapter](src/api.rs) uses separate enums because a remote submission has different recovery rules:
+
+| Type | Variants and wire values | Caller responsibility |
+|---|---|---|
+| `Endpoint` | `Responses` → `/v1/responses`; `ChatCompletions` → `/v1/chat/completions`; `Embeddings` → `/v1/embeddings` | Select an endpoint supported by the actual model and account |
+| `ApiMemberResult` | `Completed { record }`, `Failed { record }`, `Unknown`; tagged by `status` as `completed`, `failed`, `unknown` | Inspect the preserved provider record; a missing row stays unknown |
+| `ApiStatus` | `Completed`, `Partial`; JSON strings `completed`, `partial` | A batch is completed only when every reconciled member is completed |
+| `TransportOutcome` | `Confirmed { id }`, `Rejected { code }`, `Unknown`; tagged by `outcome` | Report rejection only for a proven zero-effect outcome; preserve uncertainty otherwise |
+| `SubmissionState` | `Prepared`, `Uploaded { file_id }`, `Submitted { file_id, batch_id }`, `RejectedUpload { code }`, `RejectedCreate { file_id, code }`, `UnknownUpload`, `UnknownCreate { file_id }`; tagged by `state` in snake case | Continue only the permitted lifecycle transition or reconcile the original remote operation |
+
+Example serialized lifecycle values are `{"state":"uploaded","file_id":"file-demo"}` and `{"state":"unknown_create","file_id":"file-demo"}`. `Submitted` means the provider batch was created; it does not mean its requests have finished. `ApiMemberResult::Completed` means a reconciled row has a 2xx response and a body, without an explicit error; it does not certify the generated content. `UnknownUpload` and `UnknownCreate` are not permission to retry: a timeout, crash or malformed response can follow an actual remote effect.
+
+Serde's `kind`, `status`, `outcome` and `state` tags make these distinctions explicit in JSON. Unknown enum variants and unknown fields in the typed envelopes are rejected. Provider request bodies and preserved response records intentionally remain `serde_json::Value`; the package does not impose a closed schema on every nested provider field. Schema identifiers version the package boundary. A new variant or schema requires compatible producers and consumers.
+
+Enums constrain what can be requested and how outcomes are represented. ETags bind the accepted content; revision checks protect current mutable state; transactions and the journal preserve the local effect and its report. These mechanisms work together. Enums alone do not provide idempotency, and an ETag alone does not preserve history after a restart.
+
 ## Where it helps
 
 | Situation | Package behavior |
@@ -36,7 +80,7 @@ cargo build --release --locked --all-features
 cargo run --locked --example api_adapter
 ```
 
-The API example uses a fake transport and makes zero network requests. The `openai-http` feature compiles the real HTTPS transport; building it does not contact OpenAI. Linux/macOS native builds have not been validated in the recorded test run.
+The API example uses a fake transport and makes zero network requests. The `openai-http` feature compiles the real HTTPS transport; building it does not contact OpenAI. Initial local validation used Windows; the exact-commit CI records Linux, Windows and macOS results.
 
 The release executables are `etag-for-codex`, `etag-lab`, `lab-scenarios` and `lab-restart-scenarios` under `target/release/`. On Windows their filenames end in `.exe`.
 
@@ -116,6 +160,41 @@ Storage uses `journal_mode=DELETE`, `synchronous=FULL` and `BEGIN IMMEDIATE`, wi
 
 Journals contain inputs and results in plaintext. Keep them outside Git and source distributions, restrict access and define your own backup/retention policy. Preserve pending rollback-journal files during recovery. Changes to schema or binary pin require an explicit compatibility/migration decision; no general migration tool or automatic pin rewriting is supplied. Read the [durability contract](docs/DURABILITY.md) before relying on disk recovery.
 
+## Embed the Rust library in an application
+
+The package is not published to crates.io (`publish = false`). Use an obtained source checkout as a path dependency in your application's `Cargo.toml`, replacing the path with your actual checkout:
+
+```toml
+[dependencies]
+etag-for-codex = { path = "../etag_for_codex" }
+```
+
+Enable `features = ["openai-http"]` only if your host needs the optional HTTPS transport. Rust imports use the crate name `etag_for_codex`. Obtain the applicable written license and any required source access before commercial or organizational integration; source availability does not grant those rights.
+
+The runnable [typed recovery example](examples/typed_recovery.rs) demonstrates the local SDK contract without provider calls. From this repository, create the private state directory once, then run:
+
+```sh
+mkdir private-state
+cargo run --locked --example typed_recovery -- ./private-state/typed.sqlite3 example-op-001
+cargo run --locked --example typed_recovery -- ./private-state/typed.sqlite3 example-op-001
+cargo run --locked --example typed_recovery -- ./private-state/typed.sqlite3 example-op-002
+```
+
+The first command performs one fixed `IncrementCounter { amount: 1 }` operation and verifies an immediate duplicate execution returns the same report. The second invocation starts a new process and recovers operation `example-op-001` before planning new work, so the counter stays at one. The new ID in the third invocation requests another increment; the counter becomes two. These values assume a new journal and the same executable bytes. Reusing a journal from another run or rebuilding to a different binary pin changes those conditions.
+
+The example hashes its actual executable, opens `Journal`, creates `Session::with_journal`, and calls `Session::lookup` before reading the current revision and creating a new `kernel::Batch`. It verifies `Report` bindings and handles every `MemberResult` variant with an exhaustive `match`:
+
+```rust
+match &member.result {
+    MemberResult::Sha256 { etag } => println!("hash: {etag}"),
+    MemberResult::SumI64 { value } => println!("sum: {value}"),
+    MemberResult::Counter { value } => println!("counter: {value}"),
+    MemberResult::Refused { reason } => println!("refused: {reason:?}"),
+}
+```
+
+This fragment belongs inside a loop over `report.payload.members`, with `kernel::MemberResult` imported. Use the complete example for a buildable program. Its operation ID always represents the fixed increment-by-one intent. A general application must also retain and check the original intent, accepted descriptor and ETag; a lookup by ID alone does not establish that a newly supplied request is the same operation. Keep that manifest outside transient chat context. Include relevant source hashes and current state in your own descriptor, and route real effects through their actual transaction or reconciliation owner.
+
 ## OpenAI Batch API integration
 
 The local Rust batch and the provider Batch API are different execution layers. The API adapter supports `/v1/responses`, `/v1/chat/completions` and `/v1/embeddings`. Endpoint body validity, model support and account access remain provider decisions.
@@ -164,6 +243,19 @@ cwd = "C:/path/to/etag_for_codex"
 ```
 
 Replace the example paths with your own absolute paths. On Linux/macOS use the appropriate executable name. Preserve the host's existing configuration. This is a configuration example, not an installed or end-to-end accepted Codex integration.
+
+For Codex, merge the Windows stanza above into the existing MCP configuration using the [durable configuration example](integrations/codex-durable-config.example.toml). A corresponding Unix path example is:
+
+```toml
+[mcp_servers.amqic_etag]
+command = "/absolute/path/to/etag-for-codex"
+args = ["mcp", "--journal", "/absolute/private-state/etag.sqlite3"]
+cwd = "/absolute/path/to/etag_for_codex"
+```
+
+Build the binary first and create the selected private parent directory. After the host loads the configuration, check that it discovers `etag_batch`. Explicitly direct the agent to use that tool for the selected batch: first `kernel_info`, then `kernel_plan` with a stable operation ID and the returned actual kernel pin, then `kernel_run` with the separately accepted `input_etag`. Save the original descriptor, operation ID, accepted tag and selected journal path in a host-owned manifest. On response loss or restart, recover the original request using that manifest and the same compatible journal; inspect the returned member statuses and verify its result binding. Do not silently generate a new operation ID to work around uncertainty.
+
+For example, an agent instruction can say: “Use `amqic_etag`'s `etag_batch` to plan this batch, show its input ETag for acceptance, then execute only the accepted descriptor. Save the descriptor and operation identity for recovery.” The caller still needs to implement that acceptance and persistence policy. Merely adding the server does not cause every Codex action to pass through it. The supplied MCP server exposes the synthetic kernel and local API planning/reconciliation actions; it is not a general worker for existing Codex shell or editing operations.
 
 The server inherits the launching user's OS permissions and creates no sandbox. Network upload/create remains library-only. To integrate a custom function-calling host, use the `tool_schema` action or `integrations/responses-tool.json`, validate arguments, execute the request and return the result with the original function call ID. Persist the mapping from call ID to operation ID, input ETag and result ETag.
 
@@ -248,7 +340,7 @@ It compares 16 individual CLI processes with one 16-member batch across five rou
 | `src/openai_http.rs` | Optional real HTTPS transport |
 | `src/main.rs` | One-shot JSON, JSONL service and stdio MCP |
 | `src/lab.rs`, `src/bin/` | Synthetic HTTP lab and finite consumers |
-| `examples/` | Fake API adapter and process-batching benchmark |
+| `examples/` | Typed journal recovery, fake API adapter and process-batching benchmark |
 | `tests/`, `fixtures/` | Contract, failure, concurrency and restart cases |
 
 To extend the kernel, add explicit command/result variants and exhaustive matches, update limits and wire/tool schemas, bind the actual executor pin and put mutable state/ledger under its real transaction owner. Test valid calls, unknown variants, stale refusal without effects, revision races, partial results and original-operation recovery. A numeric FFI ABI is not implemented; an eventual ABI needs checked conversion and explicit buffer ownership.
@@ -278,6 +370,6 @@ The included CI definition does not imply a passing GitHub Actions run, a signed
 
 Report security issues privately to **[cyber@amqic.ai](mailto:cyber@amqic.ai)**. Follow [Security](SECURITY.md) and avoid including credentials or private journals in public issues. [VirusTotal](VIRUSTOTAL.md) describes scan scope and recorded status; absence of a result is not a clean verdict.
 
-Copyright © 2026 **amqic.ai**. Personal **noncommercial** use is free under the terms in [LICENSE](LICENSE). **Any commercial use requires prior written permission**, including paid freelance work and use as an individual entrepreneur. Use by companies or other organizations requires a separate agreement, even without revenue. See [Commercial licensing](COMMERCIAL-LICENSE.md) and contact the owner through [the maintainer profile](https://github.com/MrMarshalRF).
+Copyright © 2026 **Aleksei Sergeyevich Musienko**, an individual entrepreneur trading as **AlexMus Quantum Information Consortium (AMQIC)**. Full public registration particulars, including registration number, INN and OKPO, are in [LICENSE](LICENSE). Personal **noncommercial** use is free under its terms. **Any commercial use requires prior written permission**, including paid freelance work and use as an individual entrepreneur. Use by companies or other organizations requires a separate agreement, even without revenue. See [Commercial licensing](COMMERCIAL-LICENSE.md) and contact the owner through [the maintainer profile](https://github.com/MrMarshalRF).
 
 The applicable custom AMQIC Personal Noncommercial License 1.0 (`LicenseRef-AMQIC-1.0`) controls permissions. This repository does not offer an MIT license or claim an OSI-approved open-source license. Third-party dependency licenses remain separate.
