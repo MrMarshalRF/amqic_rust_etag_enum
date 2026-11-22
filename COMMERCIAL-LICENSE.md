@@ -1,15 +1,15 @@
 # Commercial and organizational licensing
 
-Copyright (c) 2026 Aleksei Sergeyevich Musienko
+Copyright (c) 2026 Aleksei Sergeevich Musienko
 
-The Licensor is Aleksei Sergeyevich Musienko, an individual entrepreneur
+The Licensor is Aleksei Sergeevich Musienko, an individual entrepreneur
 operating under the commercial designation AlexMus Quantum Information
 Consortium (AMQIC).
 
 Public particulars:
 
 - Status: individual entrepreneur.
-- Full name: Aleksei Sergeyevich Musienko.
+- Full name: Aleksei Sergeevich Musienko.
 - Commercial designation: AlexMus Quantum Information Consortium (AMQIC).
 - Registration number: 001-2026-169-2608.
 - Taxpayer identification number (INN): 23005199640028.

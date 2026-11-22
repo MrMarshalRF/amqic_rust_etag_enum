@@ -51,7 +51,7 @@ Model Capacity, quota, hidden reasoning and live sockets are outside this recove
 
 The [publication workflow](docs/PUBLICATION.md) describes the closed source allowlist, inventory and archive checks. [Actions runs](https://github.com/MrMarshalRF/amqic_rust_etag_enum/actions) show checks tied to exact commits; a workflow file alone does not establish a passing run.
 
-Copyright © 2026 Aleksei Sergeyevich Musienko, an individual entrepreneur trading as AlexMus Quantum Information Consortium (AMQIC). Personal noncommercial use is free under [LICENSE](LICENSE). Commercial and organizational use require a separate written license agreement signed by the Licensor. See [commercial licensing](COMMERCIAL-LICENSE.md) and the full public owner particulars in LICENSE. This is source-available software under a custom license.
+Copyright © 2026 Aleksei Sergeevich Musienko, an individual entrepreneur trading as AlexMus Quantum Information Consortium (AMQIC). Personal noncommercial use is free under [LICENSE](LICENSE). Commercial and organizational use require a separate written license agreement signed by the Licensor. See [commercial licensing](COMMERCIAL-LICENSE.md) and the full public owner particulars in LICENSE. This is source-available software under a custom license.
 
 [VirusTotal observations](VIRUSTOTAL.md) describe exact file hashes and recorded scan status, including missing results. The [publication workflow](docs/PUBLICATION.md) explains the human-operated scan procedure; changed bytes require matching observations, and a completed scan is not proof of safety.
 
