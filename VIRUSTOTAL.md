@@ -6,7 +6,7 @@ Undetected is not proof of safety. Unsupported/failure/timeout results remain li
 | File | SHA-256 | Status | Malicious | Suspicious | Unsupported | Failure/timeouts |
 |---|---|---|---:|---:|---:|---:|
 | .gitattributes | [9806fdc5b7f72651bc7073152ca9b8e4604c537e7175e0eb4e09f8904ad0e4df](https://www.virustotal.com/gui/file/9806fdc5b7f72651bc7073152ca9b8e4604c537e7175e0eb4e09f8904ad0e4df) | known | 0 | 0 | 14 | 0 |
-| .github/workflows/ci.yml | [44fa3a5e741dae95397d552b86c531d5ae0a4daa0e7a2c5a9646c19932d31b17](https://www.virustotal.com/gui/file/44fa3a5e741dae95397d552b86c531d5ae0a4daa0e7a2c5a9646c19932d31b17) | not_queried | — | — | — | — |
+| .github/workflows/ci.yml | [5beb32373972ddac266ad20dec90e9b8c72f1d313341977b7a6d523b87185c6f](https://www.virustotal.com/gui/file/5beb32373972ddac266ad20dec90e9b8c72f1d313341977b7a6d523b87185c6f) | not_queried | — | — | — | — |
 | .gitignore | [c88a251c2e830beb627ed57fb037351195d3a7494e6b6310e228f1e5e94e2185](https://www.virustotal.com/gui/file/c88a251c2e830beb627ed57fb037351195d3a7494e6b6310e228f1e5e94e2185) | known | 0 | 0 | 14 | 0 |
 | CHANGELOG.md | [103e4128b664beee29b6c7490f58b6a6066f183018087b2065301096bb318155](https://www.virustotal.com/gui/file/103e4128b664beee29b6c7490f58b6a6066f183018087b2065301096bb318155) | known | 0 | 0 | 14 | 1 |
 | COMMERCIAL-LICENSE.md | [80a528e8fabf0865f03eebf1eab023d1892d4cd8fcb8a7bb475e892acc5f2ea3](https://www.virustotal.com/gui/file/80a528e8fabf0865f03eebf1eab023d1892d4cd8fcb8a7bb475e892acc5f2ea3) | known | 0 | 0 | 14 | 0 |

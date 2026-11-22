@@ -112,11 +112,16 @@ jobs:
           python -B scripts/test_prepare_repository.py
           python -B scripts/test_virustotal_review.py
       - name: Export committed files and verify exact source archive
-        shell: bash
+        shell: python
         run: |
-          mkdir "$RUNNER_TEMP/etag-committed"
-          git archive HEAD | tar -x -C "$RUNNER_TEMP/etag-committed"
-          python -B scripts/ci_checks.py --source "$RUNNER_TEMP/etag-committed" --output "$RUNNER_TEMP/etag-artifacts"
+          import io, os, pathlib, subprocess, sys, tarfile
+          source = pathlib.Path(os.environ["RUNNER_TEMP"]) / "etag-committed"
+          output = pathlib.Path(os.environ["RUNNER_TEMP"]) / "etag-artifacts"
+          source.mkdir()
+          archived = subprocess.run(["git", "archive", "HEAD"], check=True, stdout=subprocess.PIPE)
+          with tarfile.open(fileobj=io.BytesIO(archived.stdout)) as archive:
+              archive.extractall(source, filter="data")
+          subprocess.run([sys.executable, "-B", "scripts/ci_checks.py", "--source", str(source), "--output", str(output)], check=True)
       - name: Retain verified source archive and manifest
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
