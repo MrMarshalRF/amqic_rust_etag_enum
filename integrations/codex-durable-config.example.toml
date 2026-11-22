@@ -1,0 +1,6 @@
+# Example only. Choose your own existing private state directory and merge safely.
+# This stores synthetic kernel operations; it does not wrap built-in Codex tools.
+[mcp_servers.amqic_etag]
+command = "C:/path/to/etag-for-codex.exe"
+args = ["mcp", "--journal", "C:/path/to/private-state/etag.sqlite3"]
+cwd = "C:/path/to/etag_for_codex"

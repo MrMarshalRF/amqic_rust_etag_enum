@@ -1,0 +1,45 @@
+name: source-checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  source:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Python for offline source-publication checks
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6 ref resolved before publication
+        with:
+          python-version: '3.13'
+      - name: Pinned tested Rust toolchain
+        shell: bash
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          rustup default 1.99.1
+      - name: Rust contracts and synthetic restart laboratory
+        run: cargo test --locked --all-targets --all-features
+      - name: Offline publication and VirusTotal-runner tests
+        run: |
+          python -B scripts/test_prepare_repository.py
+          python -B scripts/test_virustotal_review.py
+      - name: Assemble and read back a source-only archive
+        # Local assembly test only: no Git push, release, key input or VT upload.
+        run: >-
+          python -B -c "import json,os,sys,tempfile;
+          sys.path.insert(0,'scripts');import prepare_repository as p;
+          base=tempfile.mkdtemp(prefix='etag-source-',dir=os.environ['RUNNER_TEMP']);
+          plan=p.plan('.');dest=os.path.join(base,'payload');
+          staged=p.stage('.',dest,plan['etag']);checked=p.verify(dest);
+          assert checked['etag']==staged['etag'];
+          print(json.dumps(p.archive_payload(dest,os.path.join(base,'source.zip'),checked['etag'])))"

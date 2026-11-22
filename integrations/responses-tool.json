@@ -1,0 +1,590 @@
+{
+  "description": "Plan and execute versioned Rust batches. Obtain a plan ETag and reuse exactly that expected_etag; operation IDs are stable. API export is local and never submits network requests.",
+  "name": "etag_batch",
+  "parameters": {
+    "additionalProperties": false,
+    "properties": {
+      "action": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "kernel_info"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "batch": {
+                "additionalProperties": false,
+                "properties": {
+                  "expected_revision": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "kernel_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "members": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "command": {
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "kind": {
+                                  "const": "sha256"
+                                },
+                                "text": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "kind": {
+                                  "const": "sum_i64"
+                                },
+                                "values": {
+                                  "items": {
+                                    "type": "integer"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "values"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "amount": {
+                                  "type": "integer"
+                                },
+                                "kind": {
+                                  "const": "increment_counter"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "amount"
+                              ],
+                              "type": "object"
+                            }
+                          ]
+                        },
+                        "id": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "command"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 1024,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "operation_id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "schema": {
+                    "const": "amqic.etag.kernel.v1"
+                  },
+                  "scope": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schema",
+                  "scope",
+                  "operation_id",
+                  "kernel_sha256",
+                  "expected_revision",
+                  "members"
+                ],
+                "type": "object"
+              },
+              "kind": {
+                "const": "kernel_plan"
+              }
+            },
+            "required": [
+              "kind",
+              "batch"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "batch": {
+                "additionalProperties": false,
+                "properties": {
+                  "expected_revision": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "kernel_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "members": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "command": {
+                          "oneOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "kind": {
+                                  "const": "sha256"
+                                },
+                                "text": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "kind": {
+                                  "const": "sum_i64"
+                                },
+                                "values": {
+                                  "items": {
+                                    "type": "integer"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "values"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "amount": {
+                                  "type": "integer"
+                                },
+                                "kind": {
+                                  "const": "increment_counter"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "amount"
+                              ],
+                              "type": "object"
+                            }
+                          ]
+                        },
+                        "id": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "command"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 1024,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "operation_id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "schema": {
+                    "const": "amqic.etag.kernel.v1"
+                  },
+                  "scope": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schema",
+                  "scope",
+                  "operation_id",
+                  "kernel_sha256",
+                  "expected_revision",
+                  "members"
+                ],
+                "type": "object"
+              },
+              "expected_etag": {
+                "pattern": "^\"sha256-[0-9a-f]{64}\"$",
+                "type": "string"
+              },
+              "kind": {
+                "const": "kernel_run"
+              }
+            },
+            "required": [
+              "kind",
+              "batch",
+              "expected_etag"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "batch": {
+                "additionalProperties": false,
+                "properties": {
+                  "endpoint": {
+                    "enum": [
+                      "/v1/responses",
+                      "/v1/chat/completions",
+                      "/v1/embeddings"
+                    ]
+                  },
+                  "operation_id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "requests": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body": {
+                          "additionalProperties": true,
+                          "properties": {
+                            "model": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "model"
+                          ],
+                          "type": "object"
+                        },
+                        "custom_id": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "custom_id",
+                        "body"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 1024,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "schema": {
+                    "const": "amqic.etag.openai-batch.v1"
+                  },
+                  "scope": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schema",
+                  "scope",
+                  "operation_id",
+                  "endpoint",
+                  "requests"
+                ],
+                "type": "object"
+              },
+              "kind": {
+                "const": "api_plan"
+              }
+            },
+            "required": [
+              "kind",
+              "batch"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "batch": {
+                "additionalProperties": false,
+                "properties": {
+                  "endpoint": {
+                    "enum": [
+                      "/v1/responses",
+                      "/v1/chat/completions",
+                      "/v1/embeddings"
+                    ]
+                  },
+                  "operation_id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "requests": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body": {
+                          "additionalProperties": true,
+                          "properties": {
+                            "model": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "model"
+                          ],
+                          "type": "object"
+                        },
+                        "custom_id": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "custom_id",
+                        "body"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 1024,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "schema": {
+                    "const": "amqic.etag.openai-batch.v1"
+                  },
+                  "scope": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schema",
+                  "scope",
+                  "operation_id",
+                  "endpoint",
+                  "requests"
+                ],
+                "type": "object"
+              },
+              "expected_etag": {
+                "pattern": "^\"sha256-[0-9a-f]{64}\"$",
+                "type": "string"
+              },
+              "kind": {
+                "const": "api_export"
+              }
+            },
+            "required": [
+              "kind",
+              "batch",
+              "expected_etag"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "batch": {
+                "additionalProperties": false,
+                "properties": {
+                  "endpoint": {
+                    "enum": [
+                      "/v1/responses",
+                      "/v1/chat/completions",
+                      "/v1/embeddings"
+                    ]
+                  },
+                  "operation_id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "requests": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body": {
+                          "additionalProperties": true,
+                          "properties": {
+                            "model": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "model"
+                          ],
+                          "type": "object"
+                        },
+                        "custom_id": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "custom_id",
+                        "body"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 1024,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "schema": {
+                    "const": "amqic.etag.openai-batch.v1"
+                  },
+                  "scope": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schema",
+                  "scope",
+                  "operation_id",
+                  "endpoint",
+                  "requests"
+                ],
+                "type": "object"
+              },
+              "expected_etag": {
+                "pattern": "^\"sha256-[0-9a-f]{64}\"$",
+                "type": "string"
+              },
+              "kind": {
+                "const": "api_reconcile"
+              },
+              "result_jsonl": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "batch",
+              "expected_etag",
+              "result_jsonl"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "input_etag": {
+                "pattern": "^\"sha256-[0-9a-f]{64}\"$",
+                "type": "string"
+              },
+              "kind": {
+                "const": "verify_result"
+              },
+              "report": {
+                "additionalProperties": false,
+                "properties": {
+                  "etag": {
+                    "pattern": "^\"sha256-[0-9a-f]{64}\"$",
+                    "type": "string"
+                  },
+                  "input_etag": {
+                    "pattern": "^\"sha256-[0-9a-f]{64}\"$",
+                    "type": "string"
+                  },
+                  "payload": {},
+                  "schema": {
+                    "const": "amqic.etag.result.v1"
+                  }
+                },
+                "required": [
+                  "schema",
+                  "input_etag",
+                  "etag",
+                  "payload"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "kind",
+              "input_etag",
+              "report"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "tool_schema"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "protocol": {
+        "enum": [
+          "etag-for-codex.v1"
+        ],
+        "type": "string"
+      }
+    },
+    "required": [
+      "protocol",
+      "action"
+    ],
+    "type": "object"
+  },
+  "type": "function"
+}

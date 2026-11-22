@@ -1,0 +1,41 @@
+# Commercial and organizational licensing
+
+Copyright (c) 2026 amqic.ai
+
+ETag for Codex is available without a license fee for personal noncommercial
+use under [the AMQIC Personal Noncommercial License 1.0](LICENSE).
+
+**Every commercial use requires a prior written license agreement with
+amqic.ai.** This applies to individuals, freelancers, contractors, sole
+proprietors and companies. Company and other organizational use also requires
+an agreement, including use of internal tools and use without revenue.
+
+Examples requiring an agreement include:
+
+- using the software for a paid client project or paid professional services;
+- integrating it into a commercial product or a company's internal workflow;
+- operating a monetized hosted service, SaaS offering or API service;
+- reselling, renting or licensing copies for payment;
+- preparing a prototype for an intended commercial deployment;
+- using it on behalf of an employer, client or other organization.
+
+Personal study or an unpaid hobby project can use the free license when it
+meets that license's personal noncommercial conditions. Being employed or
+working as a freelancer does not, by itself, prevent unrelated personal use.
+
+For current public contact channels, see [the maintainer's GitHub
+profile](https://github.com/MrMarshalRF). Describe the intended use, the parties
+involved and the rights you need. Keep confidential information out of public
+issues.
+
+A request, silence, a public download or access to the source does not grant
+permission. Obtain an express written agreement before the restricted use
+begins. Price, permitted scope, distribution rights, support and any other
+commercial terms must be agreed separately; this page makes no offer of a
+particular price, service level or support commitment.
+
+Third-party components remain subject to their respective licenses. A license
+from amqic.ai does not replace permissions required from other rights holders.
+
+The [LICENSE](LICENSE) contains the operative free-license terms. This page
+explains the licensing enquiry process and grants no additional rights.

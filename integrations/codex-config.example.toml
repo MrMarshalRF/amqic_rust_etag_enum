@@ -1,0 +1,6 @@
+# Example only: replace both paths; merge into your own trusted config.
+# No credentials, automatic installation or permission widening.
+[mcp_servers.amqic_etag]
+command = "C:/path/to/etag-for-codex.exe"
+args = ["mcp"]
+cwd = "C:/path/to/etag_for_codex"

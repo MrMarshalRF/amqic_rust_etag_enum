@@ -1,0 +1,99 @@
+AMQIC Personal Noncommercial License 1.0
+License identifier: LicenseRef-AMQIC-1.0
+
+Copyright (c) 2026 amqic.ai
+
+1. Scope and definitions
+
+The Licensor is amqic.ai. The Software is the source code, binaries and
+documentation that the Licensor distributes under this license, including
+copies and modifications of those materials. Third-party materials identified
+as separately licensed are governed by their own terms, not this license.
+
+Personal noncommercial use means use by a natural person for that person's own
+study, experimentation, hobby or unpaid personal project, without payment,
+compensation, or a purpose of obtaining a business or commercial advantage.
+It excludes use for an employer, client, company or other organization, or as
+part of duties or services performed for any of them.
+
+Commercial use includes using the Software in connection with paid work,
+professional services, a trade or business, a product or service offered for
+commercial benefit, or an activity intended to generate revenue or other
+commercial advantage. It includes preparations for such use. A use can be
+commercial even when the Software itself is free and no profit is earned.
+
+2. Free personal permission
+
+Subject to every condition below, the Licensor grants each natural person a
+nonexclusive copyright license, without a license fee, to use, run, copy and
+modify the Software for personal noncommercial use, and to share original or
+modified copies without charge for recipients' personal noncommercial use.
+
+Keep this complete license and all existing copyright and attribution notices
+with each copy or substantial portion of the Software you share. Clearly mark
+your modifications and their dates. Do not present a modified version as an
+unmodified release of the Licensor or imply the Licensor's endorsement.
+
+Each recipient receives permission directly from the Licensor under this
+license. You may not grant permission to use the Licensor's Software outside
+these terms or remove its restrictions when distributing a modified version.
+
+3. Uses requiring a separate agreement
+
+Before any commercial use, you must obtain a separate written license
+agreement from the Licensor that expressly permits the intended use.
+
+This requirement applies to individuals as well as organizations, including
+freelancers, contractors and sole proprietors. It covers, among other things:
+
+- paid client projects, paid development, consulting and contract work;
+- internal company or business operations, including internal tools;
+- use within a paid, monetized or commercial product or service;
+- software-as-a-service, hosted services or API services for commercial benefit;
+- selling, renting, licensing or otherwise supplying the Software for payment;
+- use on behalf of a commercial organization, even if the work is unpaid.
+
+A company or other organization receives no permission under the free personal
+grant. Organizational use, including use by nonprofit, educational, research
+or government organizations, requires a separate written agreement.
+
+Sending a request, receiving no reply, downloading a public copy, or obtaining
+access to the source code does not grant commercial or organizational rights.
+Permission must be obtained before the restricted use begins. Any separate
+agreement applies only to its expressly agreed parties, uses and scope.
+
+4. Other rights
+
+Only the copyright permissions expressly stated here are granted. This license
+grants no right to use the Licensor's names, logos or other trademarks except
+as necessary to preserve required notices or identify the Software truthfully.
+It does not change the licenses of third-party materials or grant rights the
+Licensor does not hold. Nothing here restricts rights you have independently
+under applicable law that cannot lawfully be restricted by these terms.
+
+5. Breach
+
+The permissions granted by this license end if you breach its conditions.
+You must stop activities that depend on those permissions unless the Licensor
+restores them in writing. A separate written agreement, if any, governs the
+rights granted under that agreement.
+
+6. Warranty and liability
+
+To the extent permitted by applicable law, the Software is supplied as is.
+The Licensor gives no warranty or assurance about its quality, suitability,
+accuracy, availability, freedom from errors or non-infringement of other rights.
+
+Where applicable law permits exclusion, the Licensor is not liable for losses
+or damages resulting from obtaining, using, modifying or sharing the Software,
+including lost data, revenue, profits or business opportunities. Nothing in
+this license excludes or limits liability that applicable law does not allow
+to be excluded or limited.
+
+7. Commercial and organizational licensing enquiries
+
+For current public contact channels, see the maintainer's GitHub profile:
+https://github.com/MrMarshalRF
+
+An enquiry is not a license. A separate written agreement is required before
+commercial or organizational use.
