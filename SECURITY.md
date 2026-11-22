@@ -58,8 +58,7 @@ exact reviewed payload with explicit disclosure permission. Never submit private
 credentials, journals, customer data or sensitive diagnostics.
 
 The [file register](VIRUSTOTAL.md) and [JSON observations](VIRUSTOTAL.json), when present,
-are tied to exact SHA-256/size and retrieval/analysis times. A changed file invalidates
-its observation. `not_queried`, `not_found`, failures, unknown outcomes, unsupported
+are tied to exact SHA-256/size and retrieval/analysis times. An observation applies only to its recorded bytes; changed bytes need a new matching observation. `not_queried`, `not_found`, failures, unknown outcomes, unsupported
 types and engine timeouts are not passed checks. Even a completed analysis with no
 detections is not proof of source safety, correct authorization, CVE clearance or
 production suitability. Generated metadata is not recursively self-scanned.
@@ -67,3 +66,30 @@ production suitability. Generated metadata is not recursively self-scanned.
 Read the official [upload policy](https://docs.virustotal.com/reference/files-scan)
 and [analysis definitions](https://docs.virustotal.com/reference/analyses-object).
 Reports and local tests provide different evidence; neither is a security certification.
+
+## Source inventory and validation records
+
+
+GitHub Actions checks formatting, Clippy with warnings denied, both feature
+configurations on Linux/Windows/macOS, the declared minimum Rust version,
+documentation, optimized restart tests, source-package integrity and RustSec
+advisories. The `CI complete` check requires every job to succeed. The source
+artifact contains verified source and a manifest; it contains no runtime journals
+or binaries. See the [Actions runs](https://github.com/MrMarshalRF/amqic_rust_etag_enum/actions)
+for results tied to an exact commit. Changes invalidate earlier VirusTotal
+observations for the changed file hashes; unqueried rows remain explicit.
+
+The publication profile retains source, examples, tests, English documentation and CI. It excludes databases, journals, logs, builds, local paths and agent work. Use the closed allowlist producer and inspect its inventory/archive readback; `.gitignore` alone is not a security boundary. See [publication workflow](docs/PUBLICATION.md).
+
+VirusTotal reports are matched by exact file SHA-256 and size. New or changed file hashes remain `not_queried` until the operator runs the reviewed terminal workflow; prior observations may be retained only when their exact SHA-256 and size still match. A completed report is not proof of safety; unsupported/error/timeout engines remain visible. Hash queries and file uploads disclose data externally. Keys are entered only through hidden human terminal input, never chat, argv, environment or piped stdin.
+
+The included CI definition does not imply a passing GitHub Actions run, a signed release, an upload or publication.
+
+
+## Voluntary support address verification
+
+The addresses in [wallets.txt](wallets.txt) were copied from the maintainer-provided sibling project's wallet file. That comparison establishes source equality for the address strings; it is not independent proof of wallet ownership. Check the exact asset, network and address before any use. A transfer on the wrong network may not be recoverable.
+
+No current QSM signature is supplied for this project's changed source inventory or wallet file. An unsigned SHA-256 inventory can detect differences against a separately trusted copy; it cannot authenticate the publisher by itself. Do not treat an older inventory or a signature from another project as covering these bytes. The maintainer's [verification page](https://amqic.ai/pages/request-verification) is a separate verification channel, not evidence that a current signature has already been issued.
+
+Voluntary support does not grant a commercial or organizational license, a service-level agreement, a financial return or an investment interest. The [license](LICENSE) and any separate written agreement govern software use.

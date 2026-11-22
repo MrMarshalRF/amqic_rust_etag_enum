@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Concise English README with a problem-first summary and detailed enum/usage
+  guides; security reporting and trust policy live in SECURITY.md.
+- Owner-designated voluntary support wallets, included in source inventories.
+- Shared ignore template with Rust/SQLite rules and generic private-directory
+  exclusion; source publication rejects internal metadata and hidden extras.
+- License version 1.1 requires a written agreement signed by the Licensor for
+  restricted use and selects Kyrgyz Republic law with a Bishkek court clause,
+  subject to mandatory rights and jurisdiction rules.
+
 - Strong versioned input/result ETags and closed Rust kernel command/result enums.
 - JSON CLI, stdio MCP and optional OpenAI Batch HTTPS transport.
 - SQLite operation journal, same-binary restart recovery and durable API intent

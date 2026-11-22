@@ -36,5 +36,5 @@ The new snapshot families are `amqic.etag.kernel.v1`, `amqic.etag.openai-batch.v
 sorted-object encoding is distinct from the legacy typed tuple encoding. Migration
 requires choosing the matching constructor and schema at each actual caller.
 
-No existing Q-Calculator, DOCTENSA, OpenAI or Codex caller was migrated/activated in
+No existing Q-Calculator, OpenAI or Codex caller was migrated/activated in
 this delivery. The standalone wrapper is the delivered integration surface.

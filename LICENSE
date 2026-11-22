@@ -1,5 +1,5 @@
-AMQIC Personal Noncommercial License 1.0
-License identifier: LicenseRef-AMQIC-1.0
+AMQIC Personal Noncommercial License 1.1
+License identifier: LicenseRef-AMQIC-1.1
 
 Copyright (c) 2026 Aleksei Sergeyevich Musienko
 
@@ -31,6 +31,10 @@ compensation, or a purpose of obtaining a business or commercial advantage.
 It excludes use for an employer, client, company or other organization, or as
 part of duties or services performed for any of them.
 
+This version applies to copies the Licensor distributes under this version.
+It does not revoke or retrospectively change permissions already granted
+under an earlier version for copies distributed under that earlier version.
+
 Commercial use includes using the Software in connection with paid work,
 professional services, a trade or business, a product or service offered for
 commercial benefit, or an activity intended to generate revenue or other
@@ -56,7 +60,8 @@ these terms or remove its restrictions when distributing a modified version.
 3. Uses requiring a separate agreement
 
 Before any commercial use, you must obtain a separate written license
-agreement from the Licensor that expressly permits the intended use.
+agreement signed by the Licensor that identifies the permitted parties and
+expressly authorizes the intended use and its scope.
 
 This requirement applies to individuals as well as organizations, including
 freelancers, contractors and sole proprietors. It covers, among other things:
@@ -72,9 +77,13 @@ A company or other organization receives no permission under the free personal
 grant. Organizational use, including use by nonprofit, educational, research
 or government organizations, requires a separate written agreement.
 
-Sending a request, receiving no reply, downloading a public copy, or obtaining
-access to the source code does not grant commercial or organizational rights.
-Permission must be obtained before the restricted use begins. Any separate
+Sending a request, receiving no reply, downloading a public copy, obtaining
+access to the source code, or receiving an informal acknowledgement does not
+grant commercial or organizational rights. Permission must be obtained
+before the restricted use begins. Unsigned issue comments, ordinary
+correspondence and other enquiries do not by themselves satisfy the signed
+agreement requirement. An electronic signature may be used if it satisfies
+the applicable requirements of the law of the Kyrgyz Republic. Any separate
 agreement applies only to its expressly agreed parties, uses and scope.
 
 4. Other rights
@@ -110,5 +119,19 @@ to be excluded or limited.
 For current public contact channels, see the maintainer's GitHub profile:
 https://github.com/MrMarshalRF
 
-An enquiry is not a license. A separate written agreement is required before
-commercial or organizational use.
+An enquiry is not a license. A separate written license agreement signed by
+the Licensor and expressly authorizing the identified parties, intended use
+and scope is required before commercial or organizational use.
+
+8. Governing law and courts
+
+This license is governed by the law of the Kyrgyz Republic. This choice does
+not exclude mandatory rules or rights that cannot lawfully be excluded by
+agreement, including applicable mandatory consumer protections.
+
+To the extent permitted by applicable law and binding international treaties,
+disputes arising out of or in connection with this license are subject to the
+exclusive jurisdiction of the competent state courts in Bishkek, Kyrgyz
+Republic. This clause does not override mandatory or exclusive jurisdiction
+rules or any right to bring proceedings in another court that cannot lawfully
+be excluded by agreement.

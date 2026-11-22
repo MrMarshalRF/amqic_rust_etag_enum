@@ -1,0 +1,19 @@
+AMQIC voluntary support wallet addresses
+
+USDT
+Network: TRC20
+Address: TTu2KEobZW3hv8RaX2VaWz4Fkj8hQ1Wjqx
+
+BTC
+Network: Bitcoin
+Address: 19BvhiToixuGvVsVw1fZTiDdAPnXhHJzG3
+
+ETH
+Network: Ethereum
+Address: 0xf26b834094b9509d5ec3131759ecb64fb45f7405
+
+Use only the exact asset and network listed.
+These address strings match the maintainer-provided reference; independent ownership is not certified.
+No current QSM signature is supplied for this project's wallet file or changed inventory.
+Read SECURITY.md for verification boundaries.
+Voluntary support grants no commercial or organizational license, SLA, financial return or investment interest.

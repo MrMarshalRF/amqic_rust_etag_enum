@@ -6,7 +6,7 @@ rust-version = "1.89"
 description = "Strong snapshot ETags, typed Rust batches and OpenAI Batch API adapters"
 license-file = "LICENSE"
 publish = false
-include = ["src/**", "examples/**", "tests/**", "fixtures/**", "scripts/*.py", "integrations/**", ".github/workflows/**", "docs/PROTOCOL.md", "docs/DURABILITY.md", "docs/COMPATIBILITY.md", "docs/VALIDATION.md", "docs/PUBLICATION.md", "README.md", "LICENSE", "COMMERCIAL-LICENSE.md", "SECURITY.md", "THIRD-PARTY-NOTICES.md", "CONTRIBUTING.md", "CHANGELOG.md", "Cargo.toml", "Cargo.lock"]
+include = ["src/**", "examples/**", "tests/**", "fixtures/**", "scripts/*.py", "integrations/**", ".github/workflows/**", "docs/PROTOCOL.md", "docs/DURABILITY.md", "docs/COMPATIBILITY.md", "docs/VALIDATION.md", "docs/PUBLICATION.md", "docs/ENUMS.md", "docs/USAGE.md", "README.md", "wallets.txt", "LICENSE", "COMMERCIAL-LICENSE.md", "SECURITY.md", "THIRD-PARTY-NOTICES.md", "CONTRIBUTING.md", "CHANGELOG.md", "Cargo.toml", "Cargo.lock"]
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

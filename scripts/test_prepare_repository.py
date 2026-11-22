@@ -47,7 +47,8 @@ class PublicationTests(unittest.TestCase):
                            ("integrations/tool.json", b"{}\n")):
             self.put(path, body)
         for path in ("out/run.json", "docs/evidence/run.json", "AGENTS.md",
-                     ".env", ".doctensa-coordinator/receipt.json", "target/file.rs"):
+                     ".env", ".agent-work/receipt.json", "target/file.rs",
+                     "src/.agent-work/private.rs", "tests/.cache/private.rs"):
             self.put(path, b"excluded bytes need not be text\xff")
         dest, result = self.staged()
         self.assertEqual((dest / "README.md").read_bytes(), b"# Example\nline\n")
@@ -56,11 +57,37 @@ class PublicationTests(unittest.TestCase):
         self.assertTrue((dest / ".github/workflows/check.yml").is_file())
         self.assertFalse((dest / "AGENTS.md").exists())
         self.assertFalse((dest / "out").exists())
+        self.assertFalse((dest / "src/.agent-work").exists())
+        self.assertFalse((dest / "tests/.cache").exists())
         self.assertEqual(result, producer.verify(dest))
         manifest = json.loads((dest / "FILES.json").read_bytes())
         item = next(x for x in manifest["files"] if x["path"] == "README.md")
         self.assertEqual(item["sha256"], producer.digest(b"# Example\nline\n"))
         self.assertEqual(item["size"], 15)
+
+    def test_public_wallet_inventory_is_hash_bound_and_private_dot_files_refuse(self):
+        self.put("wallets.txt", b"Synthetic public support metadata\r\n")
+        self.put("docs/ENUMS.md", b"# Typed variants\n")
+        self.put("docs/USAGE.md", b"# Usage\n")
+        before = producer.plan(self.source)
+        dest, _ = self.staged()
+        self.assertEqual((dest / "wallets.txt").read_bytes(), b"Synthetic public support metadata\n")
+        self.assertIn("  wallets.txt\n", (dest / "SHA256SUMS").read_text(encoding="utf-8"))
+        self.assertTrue((dest / "docs/ENUMS.md").is_file())
+        self.assertTrue((dest / "docs/USAGE.md").is_file())
+        self.put("wallets.txt", b"Changed synthetic public support metadata\n")
+        after = producer.plan(self.source)
+        self.assertNotEqual(before["inputEtag"], after["inputEtag"])
+        self.assertNotEqual(before["ordinaryEtag"], after["ordinaryEtag"])
+        self.assertNotEqual(before["etag"], after["etag"])
+        with self.assertRaisesRegex(producer.Refusal, "etag-mismatch"):
+            producer.stage(self.source, self.base / "stale-wallets", before["etag"])
+        self.assertFalse((self.base / "stale-wallets").exists())
+        extra = dest / "src/.agent-work"
+        extra.mkdir()
+        (extra / "private.rs").write_bytes(b"unpublished fixture\n")
+        with self.assertRaisesRegex(producer.Refusal, "private-path"):
+            producer.verify(dest)
 
     def test_stale_and_wrong_representation_tags_have_zero_effects(self):
         old = producer.plan(self.source)
@@ -85,6 +112,15 @@ class PublicationTests(unittest.TestCase):
         self.assertNotEqual(before["inputEtag"], after["inputEtag"])
         self.assertNotEqual(before["etag"], after["etag"])
         self.assertEqual(before["ordinaryEtag"], after["ordinaryEtag"])
+
+    def test_windows_machine_paths_refuse_but_documentation_placeholder_is_allowed(self):
+        private_path = "Z:" + "/" + "local-work/not-public"
+        self.put("README.md", private_path.encode("utf-8"))
+        with self.assertRaisesRegex(producer.Refusal, "private-machine-path"):
+            producer.plan(self.source)
+        placeholder = "C:" + "/" + "path/to/your-executor"
+        self.put("README.md", placeholder.encode("utf-8"))
+        self.assertTrue(producer.plan(self.source)["ordinaryFiles"])
 
     def test_existing_destinations_and_inside_source_are_not_modified(self):
         dest = self.base / "existing"

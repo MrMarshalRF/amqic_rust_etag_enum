@@ -25,13 +25,13 @@ MAX_TOTAL_BYTES = 32 * 1024 * 1024
 MAX_ENTRIES = 2048
 ROOT_FILES = frozenset(("Cargo.toml", "Cargo.lock", "README.md", "LICENSE",
     "COMMERCIAL-LICENSE.md", "SECURITY.md", "THIRD-PARTY-NOTICES.md",
-    "CONTRIBUTING.md", "CHANGELOG.md", ".gitignore", ".gitattributes"))
+    "CONTRIBUTING.md", "CHANGELOG.md", "wallets.txt", ".gitignore", ".gitattributes"))
 DOC_FILES = frozenset(("PROTOCOL.md", "DURABILITY.md", "COMPATIBILITY.md",
-    "VALIDATION.md", "PUBLICATION.md"))
+    "VALIDATION.md", "PUBLICATION.md", "ENUMS.md", "USAGE.md"))
 GENERATED = frozenset(("FILES.json", "SHA256SUMS", "VIRUSTOTAL.json", "VIRUSTOTAL.md"))
 VT_FILES = frozenset(("VIRUSTOTAL.json", "VIRUSTOTAL.md"))
 DENIED_PARTS = frozenset(("target", "out", ".git", ".codex", ".agents",
-    ".claude", ".vscode", ".doctensa-coordinator", "private", "local", "secrets",
+    ".claude", ".vscode", "private", "local", "secrets",
     "logs", "backups", "temp", "__pycache__"))
 DENIED_SUFFIXES = (".pem", ".key", ".p12", ".db", ".sqlite", ".sqlite3",
     ".log", ".exe", ".dll", ".zip", ".bak", ".tmp")
@@ -75,6 +75,12 @@ def check_expected(expected, actual):
         refuse("<precondition>", "etag-mismatch")
 
 
+def private_hidden_component(parts):
+    public_root_names = {".github", ".gitignore", ".gitattributes"}
+    return any(part.startswith(".") and not (i == 0 and part in public_root_names)
+               for i, part in enumerate(parts))
+
+
 def safe_name(name):
     if not isinstance(name, str) or not name or len(name) > 240:
         refuse("<path>", "invalid-path")
@@ -84,7 +90,7 @@ def safe_name(name):
                    or RESERVED.match(p) or any(ord(c) < 32 for c in p)
                    or any(c in p for c in '<>"|?*') for p in parts)):
         refuse("<path>", "invalid-path")
-    if any(p.casefold() in DENIED_PARTS or p.casefold().startswith(".env")
+    if private_hidden_component(parts) or any(p.casefold() in DENIED_PARTS or p.casefold().startswith(".env")
            or p.casefold().endswith(DENIED_SUFFIXES) for p in parts):
         refuse(name, "private-path")
     return name
@@ -171,7 +177,7 @@ def normalize(data, name):
 # Patterns are deliberately assembled: the producer and its tests are scanned
 # under the same rules as all other selected source. Findings never echo values.
 CONTENT_RULES = (
-    ("private-machine-path", re.compile(r"(?i)(?:[a-z]:[\\/]Users[\\/]|[a-z]:[\\/](?:apps|DOCTENSA)[\\/]|/" + r"home/[^/\s]+/|/" + r"Users/[^/\s]+/)")),
+    ("private-machine-path", re.compile(r"(?i)(?:[a-z]:[\\/](?!path(?:[\\/]|$))[A-Za-z0-9_.-]+|/" + r"home/[^/\s]+/|/" + r"Users/[^/\s]+/)")),
     ("agent-uuid", re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b", re.I)),
     ("private-key", re.compile("-----BEGIN " + r"(?:[A-Z]+ )?PRIVATE KEY-----")),
     ("provider-token", re.compile(r"\b(?:" + "gh" + r"[pousr]_[A-Za-z0-9]{20,}|github_" + r"pat_[A-Za-z0-9_]{20,}|sk" + r"-[A-Za-z0-9_-]{20,}|AK" + r"IA[A-Z0-9]{16})\b")),
@@ -219,7 +225,7 @@ def collect(root, payload=False):
             # unselected trees. Payload validation instead rejects every extra.
             if not payload:
                 parts = name.split("/")
-                if any(p.casefold() in DENIED_PARTS or p.casefold().startswith(".env") for p in parts):
+                if private_hidden_component(parts) or any(p.casefold() in DENIED_PARTS or p.casefold().startswith(".env") for p in parts):
                     continue
                 if not prefix and item.name not in roots and name not in ROOT_FILES:
                     continue

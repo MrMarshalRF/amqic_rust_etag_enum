@@ -22,7 +22,7 @@ python -B scripts/test_prepare_repository.py
 python -B scripts/test_virustotal_review.py
 ```
 
-The publication producer's current Windows unit run had16 cases:15 passed and1
+The publication producer's current Windows unit run had18 cases:17 passed and1
 explicit symlink-creation-denied skip. The hardlink, connected CLI, changed-input,
 secret/path denial and exact archive readback cases executed. The VirusTotal runner's
 16 offline tests passed using synthetic clients/keys only: no live query/upload or
