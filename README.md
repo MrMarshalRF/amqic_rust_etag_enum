@@ -23,7 +23,7 @@ These behaviors apply to calls explicitly routed through this package. Adding th
 
 Requirements:
 
-- Rust and Cargo. The declared minimum Rust version is **1.89**; that minimum has not been tested separately. The recorded Windows validation used **Rust 1.99.1**.
+- Rust and Cargo. The declared minimum Rust version is **1.89**. CI checks that minimum and uses **Rust 1.99.1** for the main test matrix; consult the exact revision's Actions run for its validation status.
 - A C compiler for the selected target, because `rusqlite` builds bundled SQLite. The checked Windows MSVC environment used C++ Build Tools.
 - Dependencies resolved from `Cargo.lock`. After fetching them, Cargo commands can also use `--offline`.
 
@@ -258,6 +258,15 @@ Local limits include 1,024 members, 8 MiB input/result files, 1,024 recorded ope
 `qcalculator_v1_etag` preserves one existing normalized typed-job encoding. It does not execute Q-Calculator algorithms or establish full backend parity. See [Compatibility](docs/COMPATIBILITY.md).
 
 ## Source publication and VirusTotal
+
+GitHub Actions checks formatting, Clippy with warnings denied, both feature
+configurations on Linux/Windows/macOS, the declared minimum Rust version,
+documentation, optimized restart tests, source-package integrity and RustSec
+advisories. The `CI complete` check requires every job to succeed. The source
+artifact contains verified source and a manifest; it contains no runtime journals
+or binaries. See the [Actions runs](https://github.com/MrMarshalRF/amqic_rust_etag_enum/actions)
+for results tied to an exact commit. Changes invalidate earlier VirusTotal
+observations for the changed file hashes; unqueried rows remain explicit.
 
 The publication profile retains source, examples, tests, English documentation and CI. It excludes databases, journals, logs, builds, local paths and agent work. Use the closed allowlist producer and inspect its inventory/archive readback; `.gitignore` alone is not a security boundary. See [publication workflow](docs/PUBLICATION.md).
 

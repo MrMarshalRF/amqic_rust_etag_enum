@@ -1,45 +1,155 @@
-name: source-checks
+name: CI
 on:
   push:
-    branches: [main]
   pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CARGO_TERM_COLOR: always
 jobs:
-  source:
+  quality:
+    name: Formatting and Clippy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust and quality tools
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          rustup component add rustfmt clippy --toolchain 1.99.1
+          rustup default 1.99.1
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --locked --all-targets --no-default-features -- -D warnings
+      - run: cargo clippy --locked --all-targets --all-features -- -D warnings
+  test:
+    name: Tests (${{ matrix.os }}, ${{ matrix.features }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        features: [--no-default-features, --all-features]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned tested Rust
+        shell: bash
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          rustup default 1.99.1
+      - name: Unit, CLI, API, socket and process-restart tests
+        run: cargo test --locked --all-targets ${{ matrix.features }}
+  msrv:
+    name: Minimum Rust 1.89
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install declared minimum Rust
+        run: |
+          rustup toolchain install 1.89.0 --profile minimal
+          rustup default 1.89.0
+      - run: cargo check --locked --all-targets --all-features
+  documentation:
+    name: Documentation and doctests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RUSTDOCFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          rustup default 1.99.1
+      - run: cargo doc --locked --all-features --no-deps
+      - run: cargo test --locked --doc --all-features
+  release:
+    name: Optimized build and restart tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          rustup default 1.99.1
+      - run: cargo test --release --locked --all-targets --all-features
+      - run: cargo build --release --locked --all-features --bins
+      - name: Check Cargo source-package inventory
+        run: cargo package --list --locked --allow-dirty --offline
+  publication:
+    name: Publication integrity (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 25
+    timeout-minutes: 10
     steps:
-      - name: Checkout without persisted credentials
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Python for offline source-publication checks
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6 ref resolved before publication
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.13'
-      - name: Pinned tested Rust toolchain
-        shell: bash
-        run: |
-          rustup toolchain install 1.99.1 --profile minimal
-          rustup default 1.99.1
-      - name: Rust contracts and synthetic restart laboratory
-        run: cargo test --locked --all-targets --all-features
-      - name: Offline publication and VirusTotal-runner tests
+      - name: Offline producer and VirusTotal-runner tests
         run: |
           python -B scripts/test_prepare_repository.py
           python -B scripts/test_virustotal_review.py
-      - name: Assemble and read back a source-only archive
-        # Local assembly test only: no Git push, release, key input or VT upload.
-        run: >-
-          python -B -c "import json,os,sys,tempfile;
-          sys.path.insert(0,'scripts');import prepare_repository as p;
-          base=tempfile.mkdtemp(prefix='etag-source-',dir=os.environ['RUNNER_TEMP']);
-          plan=p.plan('.');dest=os.path.join(base,'payload');
-          staged=p.stage('.',dest,plan['etag']);checked=p.verify(dest);
-          assert checked['etag']==staged['etag'];
-          print(json.dumps(p.archive_payload(dest,os.path.join(base,'source.zip'),checked['etag'])))"
+      - name: Export committed files and verify exact source archive
+        shell: bash
+        run: |
+          mkdir "$RUNNER_TEMP/etag-committed"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/etag-committed"
+          python -B scripts/ci_checks.py --source "$RUNNER_TEMP/etag-committed" --output "$RUNNER_TEMP/etag-artifacts"
+      - name: Retain verified source archive and manifest
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: verified-source-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/etag-artifacts/source.zip
+            ${{ runner.temp }}/etag-artifacts/publication.json
+          if-no-files-found: error
+          retention-days: 7
+  security:
+    name: RustSec dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust and cargo-audit
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          rustup default 1.99.1
+          cargo install cargo-audit --version 0.23.0 --locked
+      - run: cargo audit
+  ci:
+    name: CI complete
+    if: always()
+    needs: [quality, test, msrv, documentation, release, publication, security]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every check to succeed
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python3 -c 'import json,os,sys; results=json.loads(os.environ["RESULTS"]); failed={k:v["result"] for k,v in results.items() if v["result"]!="success"}; print(json.dumps(failed or {"ci":"success"})); sys.exit(bool(failed))'

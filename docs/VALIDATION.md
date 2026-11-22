@@ -35,13 +35,16 @@ real key was used. Offline success is not VirusTotal clearance.
 | Publication producer | Positive and relevant negative Python tests; closed inventory, exact hashes and ZIP readback |
 | VirusTotal runner | Fake lookup/upload/poll and actual request-construction/error-path tests; terminal/input and sidecar protection |
 | Docs/license/security/policies/templates | Human-intent and technical review, generic paths, local links and content scanner |
-| CI workflow | Pinned official action refs, read-only permissions and static scope review; first real hosted run remains separate |
+| CI workflow | Pinned official actions and read-only permissions; formatting, strict Clippy, feature/OS matrix, MSRV, docs, release tests, dependency audit and exact committed-source reconstruction |
 | FILES.json / SHA256SUMS | Recomputed against exact normalized payload; unsigned integrity, not authentication |
 | VIRUSTOTAL.json / VIRUSTOTAL.md | Exact ordinary inventory/size/SHA binding; pending/errors/engine limits remain explicit |
 
-The declared Rust minimum1.89 was not independently executed. Linux/macOS native,
-physical power failure, network-filesystem failure, live OpenAI credentials/provider,
-normal Codex activation and real VirusTotal service behavior are not established by
-these checks. No historical runtime logs, raw journals, local machine paths or agent
+The initial hosted source-checks run passed on Linux and Windows. Expanded CI checks
+Rust1.89 and Linux/Windows/macOS; inspect the exact commit's Actions result rather
+than assuming that workflow presence establishes success. Physical power failure,
+network-filesystem failure, live OpenAI credentials/provider and normal Codex
+activation are outside these checks. Real VirusTotal observations are recorded
+separately in the hash-bound register, including unqueried or limited results.
+No historical runtime logs, raw journals, local machine paths or agent
 receipts are included in this source repository. Consumers can reproduce their own
 reports locally; keep generated data outside version control.
