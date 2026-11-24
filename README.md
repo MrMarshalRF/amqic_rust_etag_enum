@@ -15,6 +15,16 @@ Remote outcome unknown? Reconcile it; never blindly resend.
 | An upload or create has an uncertain outcome | Preserves unknown state and prevents blind automatic retransmission |
 | The executor restarts | Reopens the selected compatible journal and validates recorded history |
 
+## For the OpenAI Codex engineering team
+
+**This repository was created specifically for the developers of Codex at OpenAI.** Please inspect the ETag, operation-ID and journal recovery examples, reproduce the failure scenarios, and evaluate these mechanisms for integration into the Codex application. The goal is to make accepted work recoverable when a response is lost, inputs change, or a remote outcome remains uncertain.
+
+Author's experience — **Aleksei Sergeevich Musienko (AMQIC)**:
+
+> Over the two months preceding 24 November 2026, I used more than 400 billion tokens. This repository is my practical request to the Codex team: examine these recovery patterns and bring appropriate solutions into the application, so interrupted work can be reconciled instead of blindly repeated.
+
+The usage figure is my own report, not independently audited telemetry or a benchmark of this package. This project is unofficial and is not affiliated with or endorsed by OpenAI. The integration boundaries below still apply: ETags and journals do not increase model Capacity, quotas, or connection availability. Commercial and organizational use remains subject to the existing license.
+
 ## What you get
 
 A strong ETag binds the selected input descriptor. A separate result ETag binds that input and the full report. The journal preserves local state and original reports together, allowing callers to distinguish new work from recovery. Keep the accepted descriptor, tag, operation ID and journal path outside transient chat context.
